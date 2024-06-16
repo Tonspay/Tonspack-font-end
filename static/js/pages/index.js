@@ -17,6 +17,165 @@ var balances = {
     card : 0 ,
 }
 
+/**
+ * Router struct :
+ * {
+ * t : 0, // Action type . 0 connect  . 1 sign message . 2.sign and send transaction
+ * d : {}. // Struct for different actions
+ * }
+ * 
+ * Chain information struct
+ * {
+ * t:0 , // chain type . 0 evm , 1 solana , 2 ton , 3 aptos ,4 tron , 5 cosmos 
+ * i:0 , // chain id 
+ * }
+ * 
+ * //Wallet connect action
+ * {
+ * i:"", //event ID . font-end generate uuid
+ * d:"", //Data Connect to who
+ * c:{}, //Chain struct
+ * r:"" // redirect address . null will not reqirect.
+ * }
+ * 
+ * //Sign message
+ * {
+ * i:"", //event ID . font-end generate uuid
+ * d:"", //Data Sign message . Base58encode . 
+ * c:"", // Chain struct
+ * r:""// redirect address
+ * }
+ * 
+ * //Sign and send transaction
+ * {
+ * i:"", //event ID . font-end generate uuid
+ * d:"", //Data transactions
+ * c:{}, //Chain struct
+ * r:"" // redirect address . null will not reqirect.
+ * }
+ */
+function action_connect(data)
+{
+    //display part
+
+    const mount = document.getElementById('menu_confirm_content');
+        
+    const raw = `
+                    <div class="d-flex">
+                        <h5 class="mb-0 font-600 font-14">Wallet</h5>
+                        <h5 class="mb-0 ms-auto font-600 font-14">${wallets.evm}</h5>
+                    </div>
+                    <div class="divider my-2"></div>
+                    <div class="d-flex">
+                        <h5 class="mb-0 font-600 font-14">Action</h5>
+                        <h5 class="mb-0 ms-auto font-600 font-14">Connect to site ${data.d}</h5>
+                    </div>
+                    <div class="divider my-2"></div>
+                    <div class="d-flex">
+                        <h5 class="mb-0 font-600 font-14">Permission</h5>
+                        <h5 class="mb-0 ms-auto font-600 font-14">
+                            See address|balance|activity|transactions
+                        </h5>
+                    </div>
+                    <div class="divider my-2"></div>
+                    <div class="d-flex">
+                        <h5 class="mb-0 font-600 font-14">Create Time</h5>
+                        <h5 class="mb-0 ms-auto font-600 font-14">${(new Date(Date.now())).toLocaleString()}</h5>
+                    </div>
+                    <div class="divider my-2"></div>
+                    `
+    document.getElementById('action_type').innerHTML = 'Connect'
+    mount.innerHTML = raw
+}
+function action_sign(data)
+{
+    const mount = document.getElementById('menu_confirm_content');
+        
+    const raw = `
+                        <div class="d-flex">
+                            <h5 class="mb-0 font-600 font-14">Wallet</h5>
+                            <h5 class="mb-0 ms-auto font-600 font-14">${wallets.evm}</h5>
+                        </div>
+                        <div class="divider my-2"></div>
+                        <div class="d-flex">
+                            <h5 class="mb-0 font-600 font-14">Sign message</h5>
+                            <h5 class="mb-0 ms-auto font-600 font-14">${data.d}</h5>
+                        </div>
+                        <div class="divider my-2"></div>
+                        <div class="d-flex">
+                            <h5 class="mb-0 font-600 font-14">Permission</h5>
+                            <h5 class="mb-0 ms-auto font-600 font-14">
+                                See address|balance|activity|transactions
+                            </h5>
+                        </div>
+                        <div class="divider my-2"></div>
+                        <div class="d-flex">
+                            <h5 class="mb-0 font-600 font-14">Create Time</h5>
+                            <h5 class="mb-0 ms-auto font-600 font-14">${(new Date(Date.now())).toLocaleString()}</h5>
+                        </div>
+                        <div class="divider my-2"></div>
+                        `
+        document.getElementById('action_type').innerHTML = 'Sign Message'
+    mount.innerHTML = raw
+}
+function action_send(data)
+{
+    
+}
+
+function action_router_chain(data)
+{
+    const rawData = JSON.parse(storage_get_user_tg_data())
+    const wallets = rawData.wallets;
+    switch(data.c.t)
+    {
+        case 0 :
+            balances['card'] =  balances['evm']
+            wallet_card_connected("card", wallets.evm,'evm')
+            break;
+        case 1 :
+            balances['card'] =  balances['solana']
+            wallet_card_connected("card", wallets.sol,'solana')
+            break;
+        case 2 :
+            balances['card'] =  balances['ton']
+            wallet_card_connected("card", wallets.ton,'ton')
+            break;
+        default :
+            break;
+    }
+
+}
+
+function action_router(router)
+{
+    if(router)
+        {
+            try{
+                var data = JSON.parse(
+                    Buffer.from(base58.decode(id)).toString()
+                )
+                action_router_chain(data)
+                if ( data.t == 0)
+                    {
+                        return action_connect(data);
+                    }
+
+                if ( data.t == 1)
+                    {
+                        return action_sign(data);
+                    }
+                if ( data.t == 2)
+                    {
+                        return action_send(data);
+                    }
+            }catch(e)
+            {
+
+            }
+        }
+}
+
 async function action_display() {
     try{
         // console.log(document.getElementById('menu-bill').show)
@@ -30,15 +189,17 @@ async function action_display() {
         //EVM
         balances['evm'] = (await api_balance_arb(wallets.evm))  || 0;
 
-        balances['card'] = (await api_balance_arb(wallets.evm))  || 0;
-        wallet_card_connected("card", wallets.evm,'evm')
+
+        //Action router 
+        const router = (new URLSearchParams(window.location.search)).get('tgWebAppStartParam');
 
         console.log("🚧 Balance " , balances)
-
+        
     }catch(e){
         console.error(e)
     }
 }
+
 
 async function wallets_display() {
     try{

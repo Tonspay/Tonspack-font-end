@@ -57,7 +57,8 @@ var balances = {
 function action_connect(data)
 {
     //display part
-
+    const rawData = JSON.parse(storage_get_user_tg_data())
+    const wallets = rawData.wallets;
     const mount = document.getElementById('menu_confirm_content');
         
     const raw = `
@@ -89,6 +90,8 @@ function action_connect(data)
 }
 function action_sign(data)
 {
+    const rawData = JSON.parse(storage_get_user_tg_data())
+    const wallets = rawData.wallets;
     const mount = document.getElementById('menu_confirm_content');
         
     const raw = `
@@ -153,8 +156,9 @@ function action_router(router)
         {
             try{
                 var data = JSON.parse(
-                    Buffer.from(base58.decode(id)).toString()
+                    Buffer.from(base58.decode(router)).toString()
                 )
+                console.log("🚧",data)
                 action_router_chain(data)
                 if ( data.t == 0)
                     {
@@ -171,7 +175,7 @@ function action_router(router)
                     }
             }catch(e)
             {
-
+                console.error(e)
             }
         }
 }
@@ -192,6 +196,9 @@ async function action_display() {
 
         //Action router 
         const router = (new URLSearchParams(window.location.search)).get('tgWebAppStartParam');
+        console.log("🚧",router);
+
+        action_router(router)
 
         console.log("🚧 Balance " , balances)
         

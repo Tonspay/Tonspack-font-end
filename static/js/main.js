@@ -9,9 +9,17 @@
  */
 
 
-async function init() {
+async function init(router) {
     await authToken()
-    await wallets_display()
+    if(router == "wallet")
+        {
+            await wallets_display()
+        }
+
+    if(router == "action")
+        {
+            await action_display()
+        }
     hiddenLoadingMask()
     // wallet_page_init()
 }
@@ -35,7 +43,7 @@ async function authToken() {
         )
         storage_set_user_tg_data(JSON.stringify(doauth.data))
     }else{
-        window.alert("Go to tg ")
+        // window.alert("Go to tg ")
     }
 }
 

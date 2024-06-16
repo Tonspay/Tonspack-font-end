@@ -14,6 +14,30 @@ var balances = {
     ton : 0,
     solana  :0,
     evm : 0,
+    card : 0 ,
+}
+
+async function action_display() {
+    try{
+        // console.log(document.getElementById('menu-bill').show)
+        const rawData = JSON.parse(storage_get_user_tg_data())
+        const wallets = rawData.wallets;
+
+        //TON
+        balances['ton'] = (await api_balance_ton(wallets.ton)).balance || 0;
+        //SOL
+        balances['solana'] = (await api_balance_sol(wallets.sol))  || 0;
+        //EVM
+        balances['evm'] = (await api_balance_arb(wallets.evm))  || 0;
+
+        balances['card'] = (await api_balance_arb(wallets.evm))  || 0;
+        wallet_card_connected("card", wallets.evm,'evm')
+
+        console.log("🚧 Balance " , balances)
+
+    }catch(e){
+        console.error(e)
+    }
 }
 
 async function wallets_display() {
@@ -66,16 +90,21 @@ function wallet_card_connect_button(id) {
     return 0;
 }
 //New connected card draws
-function wallet_card_connected(id, address) {
+function wallet_card_connected(id, address ,display_type) {
     const mount_connected_address = document.getElementById(id + '_card_address')
     mount_connected_address.innerHTML = `${address}`
     wallet_card_connect_button(id)
-    wallet_card_connect_balance(id)
+    wallet_card_connect_balance(id,display_type)
     return 0;
 }
 //Get the connected card balance
-function wallet_card_connect_balance(id) {
+function wallet_card_connect_balance(id,display_type) {
+    console.log('Balance disply',id,display_type)
     const mount_connected = document.getElementById(id + '_card_balance')
+    if(display_type)
+        {
+            id = display_type;
+        }
     const balance = amount_to_display(id,balances[id]);
     console.log(balance)
     mount_connected.innerHTML = `${balance}`

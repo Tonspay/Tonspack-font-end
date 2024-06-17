@@ -6,13 +6,14 @@
  * Making fetch request router . 
  */
 
-const request_baseurl = `${siteBaseUrl}/api/`
+const request_baseurl = `${siteBaseUrl}api/`
 const tonapi_baseurl = "https://tonapi.io/"
 const tonsbrige_baseurl = `${siteBaseUrl}/bridge/`
 const request_router = {
     ping: request_baseurl + "ping",
     debug: request_baseurl + "debug",
     auth: request_baseurl + "auth",
+    action: request_baseurl + "action",
     preconnect: {
         phantom: request_baseurl + "preconnect/phantom",
         metamask: request_baseurl + "preconnect/metamask",
@@ -127,6 +128,15 @@ async function api_connect(data) {
     )
 }
 
+//Post connection method
+async function api_action(data) {
+    return await requester(
+        request_router.action,
+        request_post_auth(data)
+    )
+}
+
+//Price fetch
 async function api_balance_ton(data) {
     return await requester(
         request_router.scan.tonapi.balance+data,

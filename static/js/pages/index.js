@@ -69,7 +69,7 @@ function action_connect(data)
                     <div class="divider my-2"></div>
                     <div class="d-flex">
                         <h5 class="mb-0 font-600 font-14">Action</h5>
-                        <h5 class="mb-0 ms-auto font-600 font-14">Connect to site ${data.d}</h5>
+                        <h5 class="mb-0 ms-auto font-600 font-14">Connect to : ${data.d}</h5>
                     </div>
                     <div class="divider my-2"></div>
                     <div class="d-flex">
@@ -86,6 +86,9 @@ function action_connect(data)
                     <div class="divider my-2"></div>
                     `
     document.getElementById('action_type').innerHTML = 'Connect'
+    document.getElementById('action_confirm_button').onclick = async function(){
+        await action_request(data)
+    }
     mount.innerHTML = raw
 }
 function action_sign(data)
@@ -119,13 +122,29 @@ function action_sign(data)
                         <div class="divider my-2"></div>
                         `
         document.getElementById('action_type').innerHTML = 'Sign Message'
-    mount.innerHTML = raw
+        document.getElementById('action_confirm_button').onclick = async function(){
+            await action_request(data)
+        }
+        mount.innerHTML = raw
 }
 function action_send(data)
 {
     
 }
+async function action_request(data)
+{
+    const ret = await api_action(data);
+    console.log(ret)
 
+    //Callback by the data.c or just redirect or close windows
+
+    if(data.c && data.c.length>5)
+        {
+            location.href = data.c
+        }else{
+            // await Telegram.WebApp.close()
+        }
+}
 function action_router_chain(data)
 {
     const rawData = JSON.parse(storage_get_user_tg_data())

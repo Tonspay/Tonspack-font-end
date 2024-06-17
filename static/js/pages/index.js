@@ -129,7 +129,39 @@ function action_sign(data)
 }
 function action_send(data)
 {
-    
+    const rawData = JSON.parse(storage_get_user_tg_data())
+    const wallets = rawData.wallets;
+    const mount = document.getElementById('menu_confirm_content');
+        
+    const raw = `
+                        <div class="d-flex">
+                            <h5 class="mb-0 font-600 font-14">Wallet</h5>
+                            <h5 class="mb-0 ms-auto font-600 font-14">${wallets.evm}</h5>
+                        </div>
+                        <div class="divider my-2"></div>
+                        <div class="d-flex">
+                            <h5 class="mb-0 font-600 font-14">Transaction Details</h5>
+                            <h5 class="mb-0 ms-auto font-600 font-14">${data.d}</h5>
+                        </div>
+                        <div class="divider my-2"></div>
+                        <div class="d-flex">
+                            <h5 class="mb-0 font-600 font-14">Permission</h5>
+                            <h5 class="mb-0 ms-auto font-600 font-14">
+                                See address|balance|activity|transactions
+                            </h5>
+                        </div>
+                        <div class="divider my-2"></div>
+                        <div class="d-flex">
+                            <h5 class="mb-0 font-600 font-14">Create Time</h5>
+                            <h5 class="mb-0 ms-auto font-600 font-14">${(new Date(Date.now())).toLocaleString()}</h5>
+                        </div>
+                        <div class="divider my-2"></div>
+                        `
+        document.getElementById('action_type').innerHTML = 'Send transactions'
+        document.getElementById('action_confirm_button').onclick = async function(){
+            await action_request(data)
+        }
+        mount.innerHTML = raw
 }
 async function action_request(data)
 {
@@ -142,7 +174,7 @@ async function action_request(data)
         {
             location.href = data.c
         }else{
-            // await Telegram.WebApp.close()
+            await Telegram.WebApp.close()
         }
 }
 function action_router_chain(data)

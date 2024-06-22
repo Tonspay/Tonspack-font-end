@@ -54,7 +54,7 @@ var balances = {
  * r:"" // redirect address . null will not reqirect.
  * }
  */
-function action_connect(data)
+function action_connect(data,chain)
 {
     //display part
     const rawData = JSON.parse(storage_get_user_tg_data())
@@ -64,7 +64,11 @@ function action_connect(data)
     const raw = `
                     <div class="d-flex">
                         <h5 class="mb-0 font-600 font-14">Wallet</h5>
-                        <h5 class="mb-0 ms-auto font-600 font-14">${wallets.evm}</h5>
+                        <h5 class="mb-0 ms-auto font-600 font-14">${chain.address}</h5>
+                    </div>
+                    <div class="d-flex">
+                        <h5 class="mb-0 font-600 font-14">Chain</h5>
+                        <h5 class="mb-0 ms-auto font-600 font-14">${chain.type}</h5>
                     </div>
                     <div class="divider my-2"></div>
                     <div class="d-flex">
@@ -91,17 +95,21 @@ function action_connect(data)
     }
     mount.innerHTML = raw
 }
-function action_sign(data)
+function action_sign(data,chain)
 {
     const rawData = JSON.parse(storage_get_user_tg_data())
     const wallets = rawData.wallets;
     const mount = document.getElementById('menu_confirm_content');
         
     const raw = `
-                        <div class="d-flex">
-                            <h5 class="mb-0 font-600 font-14">Wallet</h5>
-                            <h5 class="mb-0 ms-auto font-600 font-14">${wallets.evm}</h5>
-                        </div>
+                    <div class="d-flex">
+                        <h5 class="mb-0 font-600 font-14">Wallet</h5>
+                        <h5 class="mb-0 ms-auto font-600 font-14">${chain.address}</h5>
+                    </div>
+                    <div class="d-flex">
+                        <h5 class="mb-0 font-600 font-14">Chain</h5>
+                        <h5 class="mb-0 ms-auto font-600 font-14">${chain.type}</h5>
+                    </div>
                         <div class="divider my-2"></div>
                         <div class="d-flex">
                             <h5 class="mb-0 font-600 font-14">Sign message</h5>
@@ -127,17 +135,21 @@ function action_sign(data)
         }
         mount.innerHTML = raw
 }
-function action_send(data)
+function action_send(data,chain)
 {
     const rawData = JSON.parse(storage_get_user_tg_data())
     const wallets = rawData.wallets;
     const mount = document.getElementById('menu_confirm_content');
         
     const raw = `
-                        <div class="d-flex">
-                            <h5 class="mb-0 font-600 font-14">Wallet</h5>
-                            <h5 class="mb-0 ms-auto font-600 font-14">${wallets.evm}</h5>
-                        </div>
+                    <div class="d-flex">
+                        <h5 class="mb-0 font-600 font-14">Wallet</h5>
+                        <h5 class="mb-0 ms-auto font-600 font-14">${chain.address}</h5>
+                    </div>
+                    <div class="d-flex">
+                        <h5 class="mb-0 font-600 font-14">Chain</h5>
+                        <h5 class="mb-0 ms-auto font-600 font-14">${chain.type}</h5>
+                    </div>
                         <div class="divider my-2"></div>
                         <div class="d-flex">
                             <h5 class="mb-0 font-600 font-14">Transaction Details</h5>
@@ -164,7 +176,7 @@ function action_send(data)
         mount.innerHTML = raw
 }
 async function action_request(data)
-{
+{   
     const ret = await api_action(data);
     console.log(ret)
 
@@ -186,19 +198,31 @@ function action_router_chain(data)
         case 0 :
             balances['card'] =  balances['evm']
             wallet_card_connected("card", wallets.evm,'evm')
+            return {
+                type:"evm",
+                address:wallets.evm
+            }
             break;
         case 1 :
             balances['card'] =  balances['solana']
             wallet_card_connected("card", wallets.sol,'solana')
+            return {
+                type:"solana",
+                address:wallets.sol
+            }
             break;
         case 2 :
             balances['card'] =  balances['ton']
             wallet_card_connected("card", wallets.ton,'ton')
+            return {
+                type:"ton",
+                address:wallets.ton
+            }
             break;
         default :
+        return "NA"
             break;
     }
-
 }
 
 function action_router(router)
@@ -210,19 +234,20 @@ function action_router(router)
                     Buffer.from(base58.decode(router)).toString()
                 )
                 console.log("🚧",data)
-                action_router_chain(data)
+                var chain = action_router_chain(data)
+                console.log(chain)
                 if ( data.t == 0)
                     {
-                        return action_connect(data);
+                        return action_connect(data,chain);
                     }
 
                 if ( data.t == 1)
                     {
-                        return action_sign(data);
+                        return action_sign(data,chain);
                     }
                 if ( data.t == 2)
                     {
-                        return action_send(data);
+                        return action_send(data,chain);
                     }
             }catch(e)
             {

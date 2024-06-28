@@ -225,7 +225,7 @@ function action_router_chain(data)
     }
 }
 
-function action_router(router)
+async function action_router(router)
 {
     if(router)
         {
@@ -234,6 +234,21 @@ function action_router(router)
                     Buffer.from(base58.decode(router)).toString()
                 )
                 console.log("🚧",data)
+                if(data?.p)
+                {
+                    var tmpData = await api_preconnect();
+                    console.log("🚧",tmpData)
+                    if(data?.data)
+                    {
+                        data = JSON.parse(
+                            Buffer.from(base58.decode(data.data)).toString()
+                        )
+                    }else
+                    {
+                        window.alert("Connection Timeout");
+                    }
+
+                }
                 var chain = action_router_chain(data)
                 console.log(chain)
                 if ( data.t == 0)
@@ -274,7 +289,7 @@ async function action_display() {
         const router = (new URLSearchParams(window.location.search)).get('tgWebAppStartParam');
         console.log("🚧",router);
 
-        action_router(router)
+        await action_router(router)
 
         console.log("🚧 Balance " , balances)
         

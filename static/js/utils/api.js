@@ -14,6 +14,7 @@ const request_router = {
     debug: request_baseurl + "debug",
     auth: request_baseurl + "auth",
     action: request_baseurl + "action",
+    preconnect: request_baseurl + "preconnect",
     preconnect: {
         phantom: request_baseurl + "preconnect/phantom",
         metamask: request_baseurl + "preconnect/metamask",
@@ -133,6 +134,13 @@ async function api_action(data) {
     return await requester(
         request_router.action,
         request_post_auth(data)
+    )
+}
+
+async function api_preconnect(actionId) {
+    return await requester(
+        request_router.action+"/"+actionId,
+        request_get_unauth()
     )
 }
 

@@ -8,7 +8,7 @@
          case 1 : case "solana":
              return Number((amount / Math.pow(10, 9)).toFixed(5)) + " SOL"
          case 2 : case "evm":
-            return Number((amount / Math.pow(10, 1e18)).toFixed(6)) + ` ARB`
+            return Number((amount / Math.pow(10, 1e18)).toFixed(6)) + ` BNB`
          default:
              return false;
              break;

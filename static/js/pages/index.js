@@ -390,6 +390,38 @@ async function evm_disconnect_wallet(id) {
     return 0;
 }
 
+//Tools functions
+
+function copyText(id) {
+    var text = document.getElementById(id).innerText;
+    var input = document.getElementById("input");
+    input.value = text;
+    input.select();
+    // document.execCommand("copy");
+
+    console.log(text,input.value)
+
+    navigator.clipboard.writeText(text).then(
+        function(){
+            swal({
+                title: "Copy success!",
+                text: "Auto close in 1 second",
+                timer: 1000,
+                showConfirmButton: false
+            })
+        })
+      .catch(
+         function() {
+            swal({
+                title: "Copy Failed!",
+                text: "Auto close in 1 second",
+                timer: 1000,
+                showConfirmButton: false
+            })
+      });
+
+  }
+
 
 function debug() {
     console.log("🔥 Debug")

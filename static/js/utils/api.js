@@ -14,7 +14,7 @@ const request_router = {
     debug: request_baseurl + "debug",
     auth: request_baseurl + "auth",
     action: request_baseurl + "action",
-    preconnect: request_baseurl + "preconnect",
+    preconnection: request_baseurl + "preconnect",
     preconnect: {
         phantom: request_baseurl + "preconnect/phantom",
         metamask: request_baseurl + "preconnect/metamask",
@@ -139,7 +139,7 @@ async function api_action(data) {
 
 async function api_preconnect(actionId) {
     return await requester(
-        request_router.action+"/"+actionId,
+        request_router.preconnection+"/"+actionId,
         request_get_unauth()
     )
 }
@@ -158,7 +158,19 @@ async function api_balance_sol(data) {
 }
 
 async function api_balance_arb(data) {
-    const web3 = new Web3(new Web3.providers.HttpProvider('https://arbitrum.drpc.org'));
+    const web3 = new Web3(new Web3.providers.HttpProvider('https://arbitrum.llamarpc.com'));
     return web3.eth.getBalance(data);
 }
 
+async function api_balance_evm(data,chain) {
+    var web3;
+    switch (chain){
+        case "bsc":case56:
+        web3 = new Web3(new Web3.providers.HttpProvider('https://binance.llamarpc.com'))
+            break
+        default : 
+        web3 = new Web3(new Web3.providers.HttpProvider('https://arbitrum.llamarpc.com'));
+        break;
+    }
+    return web3.eth.getBalance(data);
+}

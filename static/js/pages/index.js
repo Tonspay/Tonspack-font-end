@@ -230,24 +230,27 @@ async function action_router(router)
     if(router)
         {
             try{
+                console.log(" 🚧 Cache clean test 0 ")
                 var data = JSON.parse(
                     Buffer.from(base58.decode(router)).toString()
                 )
                 console.log("🚧",data)
                 if(data?.p)
                 {
-                    var tmpData = await api_preconnect();
+                    console.log("🚧Using pre connet remote version")
+                    var tmpData = await api_preconnect(data.i);
                     console.log("🚧",tmpData)
-                    if(data?.data)
+                    if(tmpData?.data)
                     {
-                        data = JSON.parse(
-                            Buffer.from(base58.decode(data.data)).toString()
-                        )
+                        data = tmpData.data
                     }else
                     {
                         window.alert("Connection Timeout");
                     }
+                    console.log("🚧",data)
 
+                }else{
+                    console.log("🚧Using unpre connet remote version")
                 }
                 var chain = action_router_chain(data)
                 console.log(chain)
@@ -282,7 +285,7 @@ async function action_display() {
         //SOL
         balances['solana'] = (await api_balance_sol(wallets.sol))  || 0;
         //EVM
-        balances['evm'] = (await api_balance_arb(wallets.evm))  || 0;
+        balances['evm'] = (await api_balance_arb(wallets.evm,'bsc'))  || 0;
 
 
         //Action router 
@@ -313,7 +316,7 @@ async function wallets_display() {
         wallet_card_connected("solana", wallets.sol)
 
         //EVM
-        balances['evm'] = (await api_balance_arb(wallets.evm))  || 0;
+        balances['evm'] = (await api_balance_arb(wallets.evm,'bsc'))  || 0;
         wallet_card_connected("evm", wallets.evm)
 
         console.log("🚧 Balance " , balances)
